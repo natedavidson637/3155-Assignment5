@@ -3,8 +3,16 @@ from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 
 from .models import models, schemas
-from .controllers import orders
 from .dependencies.database import engine, get_db
+
+from .controllers import (
+    orders,
+    sandwiches,
+    resources,
+    recipes,
+    order_details
+)
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -53,3 +61,9 @@ def delete_one_order(order_id: int, db: Session = Depends(get_db)):
     if order is None:
         raise HTTPException(status_code=404, detail="User not found")
     return orders.delete(db=db, order_id=order_id)
+
+
+app.include_router(sandwiches.router)
+app.include_router(resources.router)
+app.include_router(recipes.router)
+app.include_router(order_details.router)
